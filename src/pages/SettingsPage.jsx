@@ -10,6 +10,7 @@ import {
   Moon,
   Sun,
   CheckCircle,
+  LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -26,6 +27,18 @@ const SettingsPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+
+  const handleLogout = () => {
+    // Clear auth token
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+
+    // Show success message
+    toast.success("Logged out successfully!");
+
+    // Redirect to login
+    navigate("/login");
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -262,6 +275,31 @@ const SettingsPage = () => {
             </h2>
           </div>
           <p className="text-gray-400 text-sm italic">Coming soon...</p>
+        </div>
+
+        {/* Logout Section */}
+        <div className="bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <LogOut className="w-6 h-6 text-white" />
+            </div>
+            <h2 className="text-xl font-black text-white uppercase">Account</h2>
+          </div>
+
+          <div className="space-y-4">
+            <p className="text-gray-400 text-sm">
+              Sign out of your account. You'll need to log in again to access
+              your data.
+            </p>
+
+            <button
+              onClick={handleLogout}
+              className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

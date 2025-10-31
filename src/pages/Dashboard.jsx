@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
-  LogOut,
   Calendar,
   TrendingUp,
   Apple,
   Dumbbell,
-  Activity,
+  Heart,
   Flame,
   Target,
   Award,
   Zap,
-  Clock,
+  ChevronRight,
   User,
+  CreditCard,
+  BookOpen,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosClient from "../lib/axios";
@@ -49,13 +51,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    toast.success("Logged out successfully");
-    navigate("/login");
-  };
-
   const calculateBMI = () => {
     if (!client?.heightCm || !client?.initialWeightKg) return null;
     const heightM = client.heightCm / 100;
@@ -63,27 +58,37 @@ const Dashboard = () => {
     return (weight / (heightM * heightM)).toFixed(1);
   };
 
+  const getBMICategory = (bmi) => {
+    if (!bmi) return null;
+    const bmiNum = parseFloat(bmi);
+    if (bmiNum < 18.5) return { text: "Underweight", color: "text-blue-400" };
+    if (bmiNum < 25) return { text: "Normal", color: "text-green-400" };
+    if (bmiNum < 30) return { text: "Overweight", color: "text-orange-400" };
+    return { text: "Obese", color: "text-red-400" };
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-600 via-red-600 to-purple-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white font-bold text-lg">
-            Loading your fitness dashboard...
-          </p>
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white font-bold text-lg">Loading...</p>
         </div>
       </div>
     );
   }
 
   const bmi = calculateBMI();
+  const bmiCategory = getBMICategory(bmi);
+  const firstName = client?.fullName?.split(" ")[0] || "Champion";
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Welcome Hero Section */}
-        <div className="relative bg-gradient-to-r from-orange-600 via-red-600 to-purple-600 rounded-2xl p-6 mb-6 overflow-hidden shadow-xl">
-          <div className="absolute inset-0 opacity-20">
+    <div className="p-4 sm:p-6 pb-24">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Hero Welcome Section */}
+        <div className="relative bg-gradient-to-br from-orange-600 via-red-600 to-purple-600 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-2xl">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
             <div
               className="absolute inset-0"
               style={{
@@ -91,200 +96,229 @@ const Dashboard = () => {
               }}
             ></div>
           </div>
+
           <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-lg">
-                <Flame className="w-8 h-8 text-orange-600" />
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <p className="text-orange-100 text-sm font-bold uppercase tracking-wide mb-2">
+                  {new Date().toLocaleDateString("en-US", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2">
+                  Hey {firstName}! 👋
+                </h1>
+                <p className="text-white/90 text-base sm:text-lg font-medium">
+                  Ready to crush your fitness goals today?
+                </p>
               </div>
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white">
-                  Welcome Back, {client?.fullName?.split(" ")[0] || "Champion"}!
-                </h2>
-                <p className="text-orange-100 font-medium text-sm sm:text-base">
-                  Let's crush those goals today 💪
+              <div className="hidden sm:block w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center animate-pulse">
+                <Flame className="w-12 h-12 text-white" />
+              </div>
+            </div>
+
+            {/* Quick Stats Row */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 sm:p-4">
+                <p className="text-white/70 text-xs font-bold uppercase mb-1">
+                  Programs
+                </p>
+                <p className="text-2xl sm:text-3xl font-black text-white">
+                  {client?.programs?.length || 0}
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 sm:p-4">
+                <p className="text-white/70 text-xs font-bold uppercase mb-1">
+                  Weight
+                </p>
+                <p className="text-2xl sm:text-3xl font-black text-white">
+                  {client?.initialWeightKg || 0}
+                  <span className="text-sm ml-1">kg</span>
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 sm:p-4">
+                <p className="text-white/70 text-xs font-bold uppercase mb-1">
+                  BMI
+                </p>
+                <p className="text-2xl sm:text-3xl font-black text-white">
+                  {bmi || "--"}
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 shadow-xl transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Dumbbell className="w-7 h-7 text-white" />
-              </div>
-              <Flame className="w-8 h-8 text-white/40" />
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <Link
+            to="/training"
+            className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-slate-700/50 hover:border-orange-500 transition-all shadow-lg hover:shadow-xl"
+          >
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <Dumbbell className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            <div>
-              <p className="text-white/90 text-sm font-bold uppercase tracking-wide mb-1">
-                Programs
-              </p>
-              <p className="text-4xl font-black text-white">
-                {client?.programs?.length || 0}
-              </p>
-            </div>
-          </div>
+            <h3 className="text-sm sm:text-base font-bold text-white mb-1">
+              My Workouts
+            </h3>
+            <p className="text-xs text-gray-400 mb-2">View schedule</p>
+            <ChevronRight className="w-4 h-4 text-orange-400 group-hover:translate-x-1 transition-transform" />
+          </Link>
 
-          <div className="bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl p-6 shadow-xl transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-7 h-7 text-white" />
-              </div>
-              <Target className="w-8 h-8 text-white/40" />
+          <Link
+            to="/training"
+            className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-slate-700/50 hover:border-green-500 transition-all shadow-lg hover:shadow-xl"
+          >
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <Apple className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            <div>
-              <p className="text-white/90 text-sm font-bold uppercase tracking-wide mb-1">
-                Weight
-              </p>
-              <p className="text-4xl font-black text-white">
-                {client?.initialWeightKg || 0}{" "}
-                <span className="text-2xl">kg</span>
-              </p>
-            </div>
-          </div>
+            <h3 className="text-sm sm:text-base font-bold text-white mb-1">
+              Diet Plan
+            </h3>
+            <p className="text-xs text-gray-400 mb-2">Meal plans</p>
+            <ChevronRight className="w-4 h-4 text-green-400 group-hover:translate-x-1 transition-transform" />
+          </Link>
 
-          <div className="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl p-6 shadow-xl transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Activity className="w-7 h-7 text-white" />
-              </div>
-              <Zap className="w-8 h-8 text-white/40" />
+          <Link
+            to="/training"
+            className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-slate-700/50 hover:border-blue-500 transition-all shadow-lg hover:shadow-xl"
+          >
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            <div>
-              <p className="text-white/90 text-sm font-bold uppercase tracking-wide mb-1">
-                Height
-              </p>
-              <p className="text-4xl font-black text-white">
-                {client?.heightCm || 0} <span className="text-2xl">cm</span>
-              </p>
-            </div>
-          </div>
+            <h3 className="text-sm sm:text-base font-bold text-white mb-1">
+              Progress
+            </h3>
+            <p className="text-xs text-gray-400 mb-2">Track stats</p>
+            <ChevronRight className="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" />
+          </Link>
 
-          <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-6 shadow-xl transform hover:scale-105 transition-transform">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Award className="w-7 h-7 text-white" />
-              </div>
-              <Activity className="w-8 h-8 text-white/40" />
+          <Link
+            to="/account"
+            className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-slate-700/50 hover:border-purple-500 transition-all shadow-lg hover:shadow-xl"
+          >
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <CreditCard className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            <div>
-              <p className="text-white/90 text-sm font-bold uppercase tracking-wide mb-1">
-                BMI
-              </p>
-              <p className="text-4xl font-black text-white">{bmi || "N/A"}</p>
-            </div>
-          </div>
+            <h3 className="text-sm sm:text-base font-bold text-white mb-1">
+              Membership
+            </h3>
+            <p className="text-xs text-gray-400 mb-2">View details</p>
+            <ChevronRight className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
 
-        {/* Enrolled Programs */}
+        {/* Your Programs */}
         {client?.programs && client.programs.length > 0 && (
-          <div className="bg-slate-900/95 backdrop-blur-xl rounded-3xl p-8 shadow-xl mb-8 border border-slate-700/50">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-                <Dumbbell className="w-7 h-7 text-white" />
+          <div className="bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                  <Flame className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white uppercase">
+                  Your Programs
+                </h2>
               </div>
-              <h3 className="text-2xl font-black text-white uppercase">
-                Your Training Programs
-              </h3>
+              <span className="text-orange-400 font-bold text-sm">
+                {client.programs.length} active
+              </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <div className="space-y-3">
               {client.programs.map((program) => (
                 <div
                   key={program.id}
-                  className="group relative bg-gradient-to-br from-slate-800 to-slate-700 border-2 border-slate-600 rounded-2xl p-6 hover:border-orange-500 transition-all"
+                  className="flex items-center gap-4 p-4 bg-slate-800/50 rounded-xl border border-slate-700 hover:border-orange-500/50 transition-all"
                 >
-                  <div className="absolute top-4 right-4">
-                    <Flame className="w-6 h-6 text-orange-400 group-hover:animate-pulse" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Dumbbell className="w-6 h-6 text-orange-400" />
                   </div>
-                  <h4 className="text-xl font-black text-white mb-2 uppercase">
-                    {program.name}
-                  </h4>
-                  <p className="text-sm text-gray-400">{program.description}</p>
-                  <div className="mt-4 pt-4 border-t border-slate-600">
-                    <div className="text-xs font-bold text-orange-400 uppercase">
-                      From LKR {program.monthlyFee}/month
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-white text-sm sm:text-base truncate">
+                      {program.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 truncate">
+                      {program.description}
+                    </p>
                   </div>
+                  <ChevronRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Coming Soon Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border-2 border-slate-700 hover:border-orange-500 transition-all">
-            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Calendar className="w-8 h-8 text-white" />
+        {/* Health Stats */}
+        <div className="bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+              <Heart className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-xl font-black text-white mb-2 uppercase">
-              My Schedule
-            </h3>
-            <p className="text-gray-400 text-sm mb-4">
-              View your personalized weekly workout plans and training sessions
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-900/30 text-yellow-300 rounded-full text-xs font-bold uppercase">
-              <Clock size={14} />
-              Coming Soon
-            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white uppercase">
+              Health Profile
+            </h2>
           </div>
 
-          <div className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border-2 border-slate-700 hover:border-red-500 transition-all">
-            <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <TrendingUp className="w-8 h-8 text-white" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+              <p className="text-gray-400 text-xs font-bold uppercase mb-2">
+                Height
+              </p>
+              <p className="text-2xl font-black text-white">
+                {client?.heightCm || "--"}
+                <span className="text-sm text-gray-400 ml-1">cm</span>
+              </p>
             </div>
-            <h3 className="text-xl font-black text-white mb-2 uppercase">
-              Progress Tracker
-            </h3>
-            <p className="text-gray-400 text-sm mb-4">
-              Track your weight, measurements, and fitness achievements
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-900/30 text-yellow-300 rounded-full text-xs font-bold uppercase">
-              <Clock size={14} />
-              Coming Soon
-            </div>
-          </div>
 
-          <div className="group bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border-2 border-slate-700 hover:border-purple-500 transition-all">
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Apple className="w-8 h-8 text-white" />
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+              <p className="text-gray-400 text-xs font-bold uppercase mb-2">
+                Weight
+              </p>
+              <p className="text-2xl font-black text-white">
+                {client?.initialWeightKg || "--"}
+                <span className="text-sm text-gray-400 ml-1">kg</span>
+              </p>
             </div>
-            <h3 className="text-xl font-black text-white mb-2 uppercase">
-              Nutrition Plans
-            </h3>
-            <p className="text-gray-400 text-sm mb-4">
-              Access your customized diet plans and meal recommendations
-            </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-900/30 text-yellow-300 rounded-full text-xs font-bold uppercase">
-              <Clock size={14} />
-              Coming Soon
+
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+              <p className="text-gray-400 text-xs font-bold uppercase mb-2">
+                BMI
+              </p>
+              <p className="text-2xl font-black text-white">{bmi || "--"}</p>
+              {bmiCategory && (
+                <p className={`text-xs font-bold ${bmiCategory.color} mt-1`}>
+                  {bmiCategory.text}
+                </p>
+              )}
+            </div>
+
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+              <p className="text-gray-400 text-xs font-bold uppercase mb-2">
+                Gender
+              </p>
+              <p className="text-2xl font-black text-white">
+                {client?.gender?.charAt(0) || "--"}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Motivational Section */}
-        <div className="mt-8 bg-gradient-to-r from-orange-600 via-red-600 to-purple-600 rounded-3xl p-8 text-center shadow-2xl">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
-            <Flame className="w-10 h-10 text-orange-600 animate-pulse" />
+        {/* Motivational Footer */}
+        <div className="bg-gradient-to-r from-orange-600/20 to-purple-600/20 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/30">
+          <div className="flex items-center gap-4">
+            <Zap className="w-12 h-12 text-orange-400 animate-pulse" />
+            <div>
+              <p className="text-white font-black text-lg mb-1">
+                Keep pushing forward! 💪
+              </p>
+              <p className="text-gray-300 text-sm">
+                Your fitness journey is a marathon, not a sprint. Every workout
+                counts!
+              </p>
+            </div>
           </div>
-          <h3 className="text-3xl font-black text-white mb-3 uppercase">
-            Stay Committed, Stay Strong!
-          </h3>
-          <p className="text-xl text-orange-100 font-medium max-w-2xl mx-auto">
-            Every workout brings you closer to your goals. Keep pushing,
-            champion!
-          </p>
-        </div>
-      </div>
-
-      {/* Floating Action Hint */}
-      <div className="fixed bottom-8 right-8 hidden lg:block">
-        <div className="bg-slate-900/95 backdrop-blur-xl rounded-2xl px-6 py-3 shadow-xl border-2 border-orange-500 animate-pulse">
-          <p className="text-sm font-bold text-white">
-            More features coming soon! 🚀
-          </p>
         </div>
       </div>
     </div>

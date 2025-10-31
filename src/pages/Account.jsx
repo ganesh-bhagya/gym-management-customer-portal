@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Upload,
   AlertCircle,
+  LogOut,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosClient from "../lib/axios";
@@ -80,6 +81,18 @@ const Account = () => {
 
   const handlePaymentSuccess = () => {
     fetchData();
+  };
+
+  const handleLogout = () => {
+    // Clear auth token
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+
+    // Show success message
+    toast.success("Logged out successfully!");
+
+    // Redirect to login
+    window.location.href = "/login";
   };
 
   const getStatusBadge = (status) => {
@@ -178,42 +191,65 @@ const Account = () => {
               My Account
             </h1>
           </div>
-          <button
-            onClick={fetchData}
-            className="p-2 sm:p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all"
-            title="Refresh"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchData}
+              className="p-2 sm:p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all"
+              title="Refresh"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-2 sm:p-3 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white rounded-xl transition-all"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Quick Links */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <Link
             to="/profile"
-            className="group flex items-center gap-3 p-4 bg-slate-800/95 hover:bg-slate-700 rounded-xl shadow-lg border border-slate-700/50 transition-all"
+            className="group flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-800/95 hover:bg-slate-700 rounded-xl shadow-lg border border-slate-700/50 transition-all"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <User className="w-6 h-6 text-white" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-white text-sm">My Profile</h3>
-              <p className="text-xs text-gray-400">View & edit details</p>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-white text-xs sm:text-sm truncate">
+                My Profile
+              </h3>
+              <p className="text-xs text-gray-400 truncate hidden sm:block">
+                View & edit details
+              </p>
+              <p className="text-xs text-gray-400 truncate sm:hidden">
+                Edit info
+              </p>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-blue-400 transition-colors flex-shrink-0" />
           </Link>
           <Link
             to="/settings"
-            className="group flex items-center gap-3 p-4 bg-slate-800/95 hover:bg-slate-700 rounded-xl shadow-lg border border-slate-700/50 transition-all"
+            className="group flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-800/95 hover:bg-slate-700 rounded-xl shadow-lg border border-slate-700/50 transition-all"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <Settings className="w-6 h-6 text-white" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-white text-sm">Settings</h3>
-              <p className="text-xs text-gray-400">Password & prefs</p>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-white text-xs sm:text-sm truncate">
+                Settings
+              </h3>
+              <p className="text-xs text-gray-400 truncate hidden sm:block">
+                Password & prefs
+              </p>
+              <p className="text-xs text-gray-400 truncate sm:hidden">
+                Preferences
+              </p>
             </div>
-            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-purple-400 transition-colors flex-shrink-0" />
           </Link>
         </div>
 
@@ -229,37 +265,37 @@ const Account = () => {
               ></div>
             </div>
             <div className="relative z-10">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
-                    <CreditCard className="w-9 h-9 text-orange-600" />
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                    <CreditCard className="w-7 h-7 sm:w-9 sm:h-9 text-orange-600" />
                   </div>
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-white uppercase">
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase truncate">
                       My Membership
                     </h2>
-                    <p className="text-orange-100 font-medium text-sm">
+                    <p className="text-orange-100 font-medium text-xs sm:text-sm truncate">
                       {membership.client?.fullName}
                     </p>
                   </div>
                 </div>
                 {isMembershipActive ? (
-                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-300 font-bold rounded-full text-sm border border-green-400">
-                    <CheckCircle size={16} /> Active
+                  <span className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-green-500/20 text-green-300 font-bold rounded-full text-xs sm:text-sm border border-green-400 self-start sm:self-auto">
+                    <CheckCircle size={14} className="sm:w-4 sm:h-4" /> Active
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-300 font-bold rounded-full text-sm border border-red-400">
-                    <XCircle size={16} /> Expired
+                  <span className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-red-500/20 text-red-300 font-bold rounded-full text-xs sm:text-sm border border-red-400 self-start sm:self-auto">
+                    <XCircle size={14} className="sm:w-4 sm:h-4" /> Expired
                   </span>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-white">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 text-white">
                 <div>
                   <p className="text-orange-100 text-xs uppercase font-bold mb-1">
                     Monthly Fee
                   </p>
-                  <p className="text-2xl font-black">
+                  <p className="text-lg sm:text-2xl font-black truncate">
                     LKR {membership.baseMonthlyFee}
                   </p>
                 </div>
@@ -267,7 +303,7 @@ const Account = () => {
                   <p className="text-orange-100 text-xs uppercase font-bold mb-1">
                     Payment Period
                   </p>
-                  <p className="text-2xl font-black">
+                  <p className="text-lg sm:text-2xl font-black truncate">
                     {getPaymentPeriodLabel(membership.paymentPeriod)}
                   </p>
                 </div>
@@ -275,7 +311,7 @@ const Account = () => {
                   <p className="text-orange-100 text-xs uppercase font-bold mb-1">
                     Start Date
                   </p>
-                  <p className="text-lg font-bold">
+                  <p className="text-sm sm:text-lg font-bold">
                     {new Date(membership.startDate).toLocaleDateString()}
                   </p>
                 </div>
@@ -283,7 +319,7 @@ const Account = () => {
                   <p className="text-orange-100 text-xs uppercase font-bold mb-1">
                     End Date
                   </p>
-                  <p className="text-lg font-bold">
+                  <p className="text-sm sm:text-lg font-bold truncate">
                     {membership.endDate
                       ? new Date(membership.endDate).toLocaleDateString()
                       : "Ongoing"}

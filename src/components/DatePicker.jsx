@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 
-const DatePicker = ({ value, onChange, label, required = false, minYear = 1940, maxYear = new Date().getFullYear() }) => {
+const DatePicker = ({
+  value,
+  onChange,
+  label,
+  required = false,
+  minYear = 1940,
+  maxYear = new Date().getFullYear(),
+}) => {
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -113,4 +120,3 @@ const DatePicker = ({ value, onChange, label, required = false, minYear = 1940, 
 };
 
 export default DatePicker;
-
